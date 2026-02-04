@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "535478705350",
+    "project_id": "my-super-cool-project-17805878",
+    "storage_bucket": "my-super-cool-project-17805878.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:535478705350:android:a7b17ebd3f0f3d828d0bc7",
+        "android_client_info": {
+          "package_name": "com.example.flutter_practise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDd6uWnGW-8AvHJZWzzWmyNjXBnwdaTqqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
