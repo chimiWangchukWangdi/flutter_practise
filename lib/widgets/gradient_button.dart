@@ -16,25 +16,29 @@ class GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final enabled = onPressed != null;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(30),
-        child: Ink(
-          height: height,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: AppTheme.buttonGradient,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+        child: Opacity(
+          opacity: enabled ? 1 : 0.6,
+          child: Ink(
+            height: height,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: AppTheme.buttonGradient,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

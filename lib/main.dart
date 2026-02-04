@@ -3,6 +3,7 @@ import 'package:flutter_practise/pages/onboarding.dart';
 import 'package:flutter_practise/theme/app_theme.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MainApp());
 }
 

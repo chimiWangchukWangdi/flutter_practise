@@ -37,12 +37,7 @@ class _OnboardingState extends State<Onboarding> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'images/money.png',
-              height: 90,
-              width: 90,
-              fit: BoxFit.cover,
-            ),
+            Icon(Icons.account_balance_wallet, size: 80, color: Colors.white),
             const Text(
               'Test Bank',
               style: TextStyle(color: Colors.white, fontSize: 30),
