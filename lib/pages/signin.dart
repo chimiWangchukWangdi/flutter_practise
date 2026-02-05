@@ -5,10 +5,11 @@ import 'package:flutter_practise/pages/signup.dart';
 import 'package:flutter_practise/pages/home.dart';
 import 'package:flutter_practise/pages/onboarding.dart';
 import 'package:flutter_practise/services/pin_service.dart';
+import 'package:flutter_practise/services/biometric_service.dart';
 import 'package:flutter_practise/theme/app_theme.dart';
 import 'package:flutter_practise/widgets/gradient_button.dart';
 
-/// Sign in: 1) M-PIN 2) Email & Password (mocked).
+/// Sign in: 1) M-PIN 2) Fingerprint 3) Email & Password (mocked).
 class Signin extends StatefulWidget {
   const Signin({super.key});
 
@@ -22,6 +23,79 @@ class _SigninState extends State<Signin> {
   final _passwordController = TextEditingController();
   String? _error;
   bool _loading = false;
+  bool _deviceHasBiometrics = false;
+  String _biometricLabel = 'Fingerprint';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricInfo();
+  }
+
+  Future<void> _loadBiometricInfo() async {
+    final hasBio = await BiometricService.deviceHasBiometrics;
+    final label = await BiometricService.getBiometricLabel();
+    if (!mounted) return;
+    setState(() {
+      _deviceHasBiometrics = hasBio;
+      _biometricLabel = label;
+    });
+  }
+
+  Future<void> _signInWithFingerprint() async {
+    if (_loading) return;
+    final canUse = await BiometricService.canUseBiometrics();
+    if (!mounted) return;
+    if (!canUse) {
+      final hasPin = await PinService.hasPin();
+      if (!mounted) return;
+      if (hasPin) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const EnterMpin()),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Enter your PIN once, then tap "Enable fingerprint" to use fingerprint next time.',
+            ),
+            duration: Duration(seconds: 4),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const SetupMpin()),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Set up M-PIN first, then you can enable fingerprint.',
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+      return;
+    }
+    setState(() => _loading = true);
+    final (ok, failureMessage) = await BiometricService.authenticate(
+      reason: 'Sign in to Test Bank',
+    );
+    if (!mounted) return;
+    setState(() => _loading = false);
+    if (ok) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const Home()),
+      );
+    } else if (failureMessage != null && failureMessage != 'Cancelled') {
+      // Show reason when we have one; skip when user cancelled or unknown
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failureMessage)));
+    }
+  }
 
   @override
   void dispose() {
@@ -181,6 +255,27 @@ class _SigninState extends State<Signin> {
             ),
           ),
           const SizedBox(height: 16),
+          if (_deviceHasBiometrics)
+            OutlinedButton.icon(
+              onPressed: _loading ? null : _signInWithFingerprint,
+              icon: const Icon(Icons.fingerprint, color: AppTheme.primary),
+              label: Text(
+                'Sign in with $_biometricLabel',
+                style: const TextStyle(
+                  color: AppTheme.primary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: const BorderSide(color: AppTheme.primary, width: 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          if (_deviceHasBiometrics) const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () => setState(() {
               _showEmailForm = true;

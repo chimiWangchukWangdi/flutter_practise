@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practise/theme/app_theme.dart';
 import 'package:flutter_practise/services/pin_service.dart';
+import 'package:flutter_practise/services/biometric_service.dart';
 import 'package:flutter_practise/widgets/gradient_button.dart';
 import 'package:flutter_practise/widgets/pin_input.dart';
 import 'package:flutter_practise/pages/home.dart';
@@ -44,6 +45,16 @@ class _SetupMpinState extends State<SetupMpin> {
     try {
       await PinService.setPin(_pin);
       if (!mounted) return;
+      final hasBiometrics = await BiometricService.deviceHasBiometrics;
+      if (!mounted) return;
+      if (hasBiometrics) {
+        final useBiometrics = await _showEnableBiometricsDialog();
+        if (!mounted) return;
+        if (useBiometrics) {
+          await BiometricService.setBiometricsEnabled(true);
+        }
+      }
+      if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const Home()),
         (route) => false,
@@ -59,6 +70,31 @@ class _SetupMpinState extends State<SetupMpin> {
         _loading = false;
       });
     }
+  }
+
+  Future<bool> _showEnableBiometricsDialog() async {
+    final label = await BiometricService.getBiometricLabel();
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Use biometrics to unlock?'),
+        content: Text(
+          'You can use $label to unlock the app instead of entering your PIN each time.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Not now'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Enable'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   @override

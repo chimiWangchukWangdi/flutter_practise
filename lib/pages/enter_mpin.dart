@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practise/theme/app_theme.dart';
 import 'package:flutter_practise/services/pin_service.dart';
+import 'package:flutter_practise/services/biometric_service.dart';
 import 'package:flutter_practise/widgets/gradient_button.dart';
 import 'package:flutter_practise/widgets/pin_input.dart';
 import 'package:flutter_practise/pages/home.dart';
 import 'package:flutter_practise/pages/onboarding.dart';
 
-/// Enter 6-digit M-PIN to unlock the app.
+/// Enter 6-digit M-PIN or fingerprint/face to unlock the app.
 class EnterMpin extends StatefulWidget {
   const EnterMpin({super.key});
 
@@ -20,6 +21,64 @@ class _EnterMpinState extends State<EnterMpin> {
   String _pin = '';
   String? _error;
   bool _loading = false;
+  bool _biometricsAvailable = false;
+  bool _canEnableBiometrics =
+      false; // device has biometrics but user hasn't enabled in app
+  String _biometricLabel = 'Biometrics';
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+  }
+
+  Future<void> _checkBiometrics() async {
+    final canUse = await BiometricService.canUseBiometrics();
+    final label = await BiometricService.getBiometricLabel();
+    final deviceHas = await BiometricService.deviceHasBiometrics;
+    final enabled = await BiometricService.isBiometricsEnabled();
+    if (!mounted) return;
+    setState(() {
+      _biometricsAvailable = canUse;
+      _biometricLabel = label;
+      _canEnableBiometrics = deviceHas && !enabled;
+    });
+    if (canUse) {
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (!mounted) return;
+        _authenticateWithBiometrics();
+      });
+    }
+  }
+
+  Future<void> _enableBiometricsAndUnlock() async {
+    if (!_canEnableBiometrics || _loading) return;
+    setState(() => _loading = true);
+    await BiometricService.setBiometricsEnabled(true);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _biometricsAvailable = true;
+      _canEnableBiometrics = false;
+    });
+    await _authenticateWithBiometrics();
+  }
+
+  Future<void> _authenticateWithBiometrics() async {
+    if (!_biometricsAvailable || _loading || !mounted) return;
+    setState(() => _loading = true);
+    final (ok, _) = await BiometricService.authenticate(
+      reason: 'Unlock Test Bank',
+    );
+    if (!mounted) return;
+    setState(() => _loading = false);
+    if (ok) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const Home()),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -115,12 +174,61 @@ class _EnterMpinState extends State<EnterMpin> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 24),
+                      if (_biometricsAvailable) ...[
+                        Center(
+                          child: IconButton(
+                            onPressed: _loading
+                                ? null
+                                : _authenticateWithBiometrics,
+                            iconSize: 56,
+                            icon: const Icon(
+                              Icons.fingerprint,
+                              color: AppTheme.primary,
+                              size: 56,
+                            ),
+                            tooltip: _biometricLabel,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Or enter your M-PIN',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       PinInput(
                         controller: _pinController,
                         hintText: '••••••',
-                        autofocus: true,
+                        autofocus: !_biometricsAvailable,
                         onChanged: (v) => setState(() => _pin = v),
                       ),
+                      if (_canEnableBiometrics) ...[
+                        const SizedBox(height: 12),
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: _loading
+                                ? null
+                                : _enableBiometricsAndUnlock,
+                            icon: const Icon(
+                              Icons.fingerprint,
+                              size: 20,
+                              color: AppTheme.linkBlue,
+                            ),
+                            label: Text(
+                              'Enable $_biometricLabel unlock',
+                              style: const TextStyle(
+                                color: AppTheme.linkBlue,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                       if (_error != null) ...[
                         const SizedBox(height: 16),
                         Text(

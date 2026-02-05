@@ -35,6 +35,11 @@ class PinService {
     await AppDatabase.insertPinHash(hashB64, saltB64);
   }
 
+  /// Clear stored M-PIN (and thus biometric preference). Use for forgot-PIN or backend reset.
+  static Future<void> clearPin() async {
+    await AppDatabase.clearAuth();
+  }
+
   /// Verify [pin] against stored hash. Returns true if correct.
   static Future<bool> verifyPin(String pin) async {
     if (!_isValidPin(pin)) return false;
