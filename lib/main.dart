@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_practise/pages/onboarding.dart';
+import 'package:flutter_practise/pages/app_start.dart';
 import 'package:flutter_practise/theme/app_theme.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MainApp extends StatelessWidget {
       title: 'Test Bank',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      home: const Onboarding(),
+      home: const AppStart(),
     );
   }
 }

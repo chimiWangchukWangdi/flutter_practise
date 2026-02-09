@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practise/theme/app_theme.dart';
-import 'package:flutter_practise/pages/onboarding.dart';
+import 'package:flutter_practise/pages/enter_mpin.dart';
 
 /// Placeholder home after M-PIN auth.
 class Home extends StatelessWidget {
@@ -8,7 +8,7 @@ class Home extends StatelessWidget {
 
   void _logout(BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const Onboarding()),
+      MaterialPageRoute(builder: (_) => const EnterMpin()),
       (route) => false,
     );
   }

@@ -255,26 +255,26 @@ class _SigninState extends State<Signin> {
             ),
           ),
           const SizedBox(height: 16),
-          if (_deviceHasBiometrics)
-            OutlinedButton.icon(
-              onPressed: _loading ? null : _signInWithFingerprint,
-              icon: const Icon(Icons.fingerprint, color: AppTheme.primary),
-              label: Text(
-                'Sign in with $_biometricLabel',
-                style: const TextStyle(
-                  color: AppTheme.primary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: const BorderSide(color: AppTheme.primary, width: 2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
+          // if (_deviceHasBiometrics)
+          //   OutlinedButton.icon(
+          //     onPressed: _loading ? null : _signInWithFingerprint,
+          //     icon: const Icon(Icons.fingerprint, color: AppTheme.primary),
+          //     label: Text(
+          //       'Sign in with $_biometricLabel',
+          //       style: const TextStyle(
+          //         color: AppTheme.primary,
+          //         fontSize: 18,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+          //     style: OutlinedButton.styleFrom(
+          //       padding: const EdgeInsets.symmetric(vertical: 16),
+          //       side: const BorderSide(color: AppTheme.primary, width: 2),
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(12),
+          //       ),
+          //     ),
+          //   ),
           if (_deviceHasBiometrics) const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () => setState(() {

@@ -43,12 +43,6 @@ class _EnterMpinState extends State<EnterMpin> {
       _biometricLabel = label;
       _canEnableBiometrics = deviceHas && !enabled;
     });
-    if (canUse) {
-      Future.delayed(const Duration(milliseconds: 400), () {
-        if (!mounted) return;
-        _authenticateWithBiometrics();
-      });
-    }
   }
 
   Future<void> _enableBiometricsAndUnlock() async {
@@ -170,82 +164,106 @@ class _EnterMpinState extends State<EnterMpin> {
                       topRight: Radius.circular(20),
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 24),
-                      if (_biometricsAvailable) ...[
-                        Center(
-                          child: IconButton(
-                            onPressed: _loading
-                                ? null
-                                : _authenticateWithBiometrics,
-                            iconSize: 56,
-                            icon: const Icon(
-                              Icons.fingerprint,
-                              color: AppTheme.primary,
-                              size: 56,
-                            ),
-                            tooltip: _biometricLabel,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Or enter your M-PIN',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                      PinInput(
-                        controller: _pinController,
-                        hintText: '••••••',
-                        autofocus: !_biometricsAvailable,
-                        onChanged: (v) => setState(() => _pin = v),
-                      ),
-                      if (_canEnableBiometrics) ...[
-                        const SizedBox(height: 12),
-                        Center(
-                          child: TextButton.icon(
-                            onPressed: _loading
-                                ? null
-                                : _enableBiometricsAndUnlock,
-                            icon: const Icon(
-                              Icons.fingerprint,
-                              size: 20,
-                              color: AppTheme.linkBlue,
-                            ),
-                            label: Text(
-                              'Enable $_biometricLabel unlock',
-                              style: const TextStyle(
-                                color: AppTheme.linkBlue,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 24),
+                        if (_biometricsAvailable) ...[
+                          Center(
+                            child: InkWell(
+                              onTap: _loading ? null : _authenticateWithBiometrics,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.fingerprint,
+                                      color: _loading
+                                          ? Colors.grey
+                                          : AppTheme.primary,
+                                      size: 32,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Use $_biometricLabel',
+                                      style: TextStyle(
+                                        color: _loading
+                                            ? Colors.grey
+                                            : AppTheme.primary,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                      if (_error != null) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          _error!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 14,
+                          const SizedBox(height: 8),
+                          Text(
+                            'Or enter your M-PIN',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
                           ),
+                          const SizedBox(height: 16),
+                        ],
+                        PinInput(
+                          controller: _pinController,
+                          hintText: '••••••',
+                          autofocus: !_biometricsAvailable,
+                          onChanged: (v) => setState(() => _pin = v),
+                        ),
+                        if (_canEnableBiometrics) ...[
+                          const SizedBox(height: 12),
+                          Center(
+                            child: TextButton.icon(
+                              onPressed: _loading
+                                  ? null
+                                  : _enableBiometricsAndUnlock,
+                              icon: const Icon(
+                                Icons.fingerprint,
+                                size: 20,
+                                color: AppTheme.linkBlue,
+                              ),
+                              label: Text(
+                                'Enable $_biometricLabel unlock',
+                                style: const TextStyle(
+                                  color: AppTheme.linkBlue,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (_error != null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            _error!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 32),
+                        GradientButton(
+                          label: _loading ? 'Verifying…' : 'Unlock',
+                          onPressed: _canSubmit ? _submit : null,
                         ),
                       ],
-                      const SizedBox(height: 32),
-                      GradientButton(
-                        label: _loading ? 'Verifying…' : 'Unlock',
-                        onPressed: _canSubmit ? _submit : null,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
