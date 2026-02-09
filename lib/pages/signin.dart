@@ -24,7 +24,7 @@ class _SigninState extends State<Signin> {
   String? _error;
   bool _loading = false;
   bool _deviceHasBiometrics = false;
-  String _biometricLabel = 'Fingerprint';
+  // String _biometricLabel = 'Fingerprint';
 
   @override
   void initState() {
@@ -34,68 +34,68 @@ class _SigninState extends State<Signin> {
 
   Future<void> _loadBiometricInfo() async {
     final hasBio = await BiometricService.deviceHasBiometrics;
-    final label = await BiometricService.getBiometricLabel();
+    // final label = await BiometricService.getBiometricLabel();
     if (!mounted) return;
     setState(() {
       _deviceHasBiometrics = hasBio;
-      _biometricLabel = label;
+      // _biometricLabel = label;
     });
   }
 
-  Future<void> _signInWithFingerprint() async {
-    if (_loading) return;
-    final canUse = await BiometricService.canUseBiometrics();
-    if (!mounted) return;
-    if (!canUse) {
-      final hasPin = await PinService.hasPin();
-      if (!mounted) return;
-      if (hasPin) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const EnterMpin()),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Enter your PIN once, then tap "Enable fingerprint" to use fingerprint next time.',
-            ),
-            duration: Duration(seconds: 4),
-          ),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const SetupMpin()),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Set up M-PIN first, then you can enable fingerprint.',
-            ),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-      return;
-    }
-    setState(() => _loading = true);
-    final (ok, failureMessage) = await BiometricService.authenticate(
-      reason: 'Sign in to Test Bank',
-    );
-    if (!mounted) return;
-    setState(() => _loading = false);
-    if (ok) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Home()),
-      );
-    } else if (failureMessage != null && failureMessage != 'Cancelled') {
-      // Show reason when we have one; skip when user cancelled or unknown
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(failureMessage)));
-    }
-  }
+  // Future<void> _signInWithFingerprint() async {
+  //   if (_loading) return;
+  //   final canUse = await BiometricService.canUseBiometrics();
+  //   if (!mounted) return;
+  //   if (!canUse) {
+  //     final hasPin = await PinService.hasPin();
+  //     if (!mounted) return;
+  //     if (hasPin) {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (_) => const EnterMpin()),
+  //       );
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text(
+  //             'Enter your PIN once, then tap "Enable fingerprint" to use fingerprint next time.',
+  //           ),
+  //           duration: Duration(seconds: 4),
+  //         ),
+  //       );
+  //     } else {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (_) => const SetupMpin()),
+  //       );
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text(
+  //             'Set up M-PIN first, then you can enable fingerprint.',
+  //           ),
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //     }
+  //     return;
+  //   }
+  //   setState(() => _loading = true);
+  //   final (ok, failureMessage) = await BiometricService.authenticate(
+  //     reason: 'Sign in to Test Bank',
+  //   );
+  //   if (!mounted) return;
+  //   setState(() => _loading = false);
+  //   if (ok) {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (_) => const Home()),
+  //     );
+  //   } else if (failureMessage != null && failureMessage != 'Cancelled') {
+  //     // Show reason when we have one; skip when user cancelled or unknown
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text(failureMessage)));
+  //   }
+  // }
 
   @override
   void dispose() {
